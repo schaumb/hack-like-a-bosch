@@ -49,7 +49,7 @@
 			font-size: 50px;
 		}
 		
-		#myRange {
+		.slider {
 			width: 100%;
 		}
 	</style>
@@ -60,9 +60,9 @@
 <body>
 	<div id="container">
 		<canvas id="myCanvas" width="1000" height="600" style="border:1px solid #000000;"></canvas>
-		<input type="range" min="1" max="100" value="50" class="slider" id="myRange">
-		<button id="pauseButton">Pause</button>
-		<button id="playButton">Play</button>
+		<input type="range" min="1" max="100" value="1" class="slider" id="slider" onchange="sliderChangeEvent()">
+		<button id="pauseButton" onclick="pause()">Pause</button>
+		<button id="playButton" onclick="play()">Play</button>
 	</div>
 
 	<div id="ownLogo"><font color="brown">🍞</font><font color="black">➕️</font><font color="red">🍅</font></div>
@@ -389,6 +389,21 @@
 			y: loc.y,
 			z: loc.z
 		});
+	}
+
+	function pause(){
+		$("#pauseButton").attr("disabled",true);
+		$("#playButton").attr("disabled",false);
+	}
+
+	function play(){
+		$("#pauseButton").attr("disabled",false);
+		$("#playButton").attr("disabled",true);
+	}
+
+	function sliderChangeEvent(){
+		let value = $("#slider").val();
+		console.log(value);
 	}
 
 			//function textList()
