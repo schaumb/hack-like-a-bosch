@@ -60,11 +60,11 @@
 						minZ = scanData[i].location[2];
 					}
 					
-					if (scanData[i].id > maxZ) {
-						maxZ = scanData[i].location[2];
+					if (scanData[i].timestamp > maxTime) {
+						maxTime = scanData[i].timestamp;
 					}
-					if (scanData[i].location[2] < minZ) {
-						minZ = scanData[i].location[2];
+					if (scanData[i].timestamp < minTime) {
+						minTime = scanData[i].timestamp;
 					}
 					
 					//Location build
@@ -85,7 +85,7 @@
 					
 					
 					ctx.beginPath();
-					ctx.arc(scanData[i].location[0] * 22 - 200, scanData[i].location[1] * 20 - (scanData[i].location[2] * 10), -scanData[i].location[2] + 5, 0, 2 * Math.PI);
+					ctx.arc(scanData[i].location[0] * 22 - 200, scanData[i].location[1] * 20 - (scanData[i].location[2] * 10), (-scanData[i].location[2] / 2) + 5, 0, 2 * Math.PI);
 					ctx.stroke();
 					
 					if (items[scanData[i].id] != undefined) {
@@ -120,14 +120,33 @@
 					}
 				});
 				
-				console.log(maxX);
-				console.log(minX);
-				console.log(maxY);
-				console.log(minY);
-				console.log(maxZ);
-				console.log(minZ);
+				console.log("MaxX:" + maxX);
+				console.log("MinX:" + minX);
+				console.log("MaxY:" + maxY);
+				console.log("MinY:" + minY);
+				console.log("MaxZ:" + maxZ);
+				console.log("MinZ:" + minZ);
+				console.log("MaxTime:" + maxTime);
+				console.log("MinTime:" + minTime);
+				console.log("Timediff:" + (maxTime - minTime));
 				
 			});
+			
+			function drawType(x, y, z, type) {
+				// The size of the emoji is set with the font
+				ctx.font = '20px serif'
+				ctx.textAlign = "center"; 
+				ctx.textBaseline = "middle"; 
+				
+				var emojistring = "";
+				
+				switch (type) {
+					case "example": emojistring = "hehe"; break;
+					case "bread": emojistring = "🍞"; break;
+				}
+				
+				ctx.fillText(emojistring, x, y);
+			}
 			
 		</script>
 	
