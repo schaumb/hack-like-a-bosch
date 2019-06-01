@@ -14,7 +14,7 @@
     </head>
     <body>
 
-     <canvas id="myCanvas" width="1000" height="400" style="border:1px solid #000000;">
+     <canvas id="myCanvas" width="1000" height="600" style="border:1px solid #000000;">
 	</canvas>
 
     </body>
@@ -23,6 +23,7 @@
 			var c = document.getElementById("myCanvas");
 			var ctx = c.getContext("2d");
 			var items = [];
+			var locations = [];
 		
 			$.ajax({
 				method: "GET",
@@ -32,9 +33,12 @@
 				scanData = JSON.parse(data);
 				
 				var maxX = -10000.0, minX = 10000.0, maxY = -10000.0, minY = 10000.0, maxZ = -10000.0, minZ = 10000.0;
+				var minTime = 15393024303810, maxTime = 0;
 				
 				
 				for (i = 0; i < scanData.length; i++) {
+				
+					//MinMax calculations
 					if (scanData[i].location[0] > maxX) {
 						maxX = scanData[i].location[0];
 					}
@@ -63,29 +67,58 @@
 						minZ = scanData[i].location[2];
 					}
 					
+					//Location build
+					var locationCount = 0;
+					while (locationCount < locations.length && !(locations[locationCount].x == scanData[i].location[0] &&
+																 locations[locationCount].y == scanData[i].location[1] &&
+																 locations[locationCount].z == scanData[i].location[2])) {
+						locationCount++;
+					}
+					
+					if (locationCount == locations.length) {
+						locations.push({
+							x:scanData[i].location[0],
+							y:scanData[i].location[1],
+							z:scanData[i].location[2]
+						});
+					}
+					
+					
 					ctx.beginPath();
-					ctx.arc(scanData[i].location[0] * 22 - 200, scanData[i].location[1] * 20, -minZ + scanData[i].location[2], 0, 2 * Math.PI);
+					ctx.arc(scanData[i].location[0] * 22 - 200, scanData[i].location[1] * 20 - (scanData[i].location[2] * 10), -scanData[i].location[2] + 5, 0, 2 * Math.PI);
 					ctx.stroke();
 					
 					if (items[scanData[i].id] != undefined) {
-						ctx.strokeStyle = "black";
-						ctx.moveTo(items[scanData[i].id].location[0] * 22 - 200, items[scanData[i].id].location[1] * 20);
-						ctx.lineTo(scanData[i].location[0] * 22 - 200, scanData[i].location[1] * 20);
+						
+						ctx.moveTo(items[scanData[i].id].location[0] * 22 - 200, items[scanData[i].id].location[1] * 20 - (items[scanData[i].id].location[2] * 10));
+						ctx.lineTo(scanData[i].location[0] * 22 - 200, scanData[i].location[1] * 20 - (scanData[i].location[2] * 10));
+						//ctx.strokeStyle = "green";
 						ctx.stroke();
 						
-						ctx.strokeStyle = "red";
-						ctx.moveTo(items[scanData[i].id].location[0] * 22 - 200, items[scanData[i].id].location[1] * 20);
+						/*ctx.moveTo(items[scanData[i].id].location[0] * 22 - 200, items[scanData[i].id].location[1] * 20);
 						ctx.lineTo(items[scanData[i].id].location[0] * 22 - 200, scanData[i].location[1] * 20);
+						//ctx.strokeStyle = "red";
 						ctx.stroke();
 						
 						ctx.moveTo(items[scanData[i].id].location[0] * 22 - 200, scanData[i].location[1] * 20);
 						ctx.lineTo(scanData[i].location[0] * 22 - 200, scanData[i].location[1] * 20);
-						ctx.stroke();
+						//ctx.strokeStyle = "red";
+						ctx.stroke();*/
 						
 					}
 					
 					items[scanData[i].id] = scanData[i];
 				};
+				
+				locations.sort(function (a,b) {
+					if (a.x != b.x) {
+						return b.x - a.x;
+					} else if (a.y != b.y) {
+						return b.y - a.y;
+					} else {
+						return b.z - a.z;
+					}
+				});
 				
 				console.log(maxX);
 				console.log(minX);
