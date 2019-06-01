@@ -73,6 +73,7 @@
 		<button id="playButton" onclick="play()">Play</button>
 		<input id="gotoInput" type="text">
 		<button id="gotoButton" onclick="goToTime()">Go</button>
+		<br><span>Height scale:</span><input type="range" style="width: 50%" id="heightSlider" oninput="heightSliderChange()">
 	</div>
 
 	<div id="ownLogo"><font color="brown">🍞</font><font color="black">➕️</font><font color="red">🍅</font></div>
@@ -88,6 +89,7 @@
 	var timeBetweenTicks = tickRate * 10;
 	var timer;
 	var filterType;
+	var zScale = 10;
 	
 	var checkpoints = [];
 	var maxX = -10000.0, minX = 10000.0, maxY = -10000.0, minY = 10000.0, maxZ = -10000.0, minZ = 10000.0;
@@ -194,6 +196,7 @@
 
 		
 		$("#slider").attr("min",minTime).attr("max",maxTime);
+		$("#heightSlider").attr("min",0).attr("max",20).val(10);
 		currentTime = minTime;
 		clearCanvas();
 		drawCanvas();
@@ -432,7 +435,7 @@
 	function circlePos(cp) {
 		return {
 			x: cp.x * 22 - 200,
-			y: cp.y * 20 - (cp.z * 10),
+			y: cp.y * 20 - (cp.z * zScale),
 			r: circleRadius(cp)
 		}
 	}
@@ -545,6 +548,7 @@
 				
 				
 				var hehe = circlePosBetween(previousCP, nextCP, timeScale * 100);
+<<<<<<< Updated upstream
 				/*ctx.beginPath();
 
 				ctx.arc(hehe.x, hehe.y, hehe.r, 0, 2 * Math.PI);
@@ -553,6 +557,10 @@
 				if(filterType == undefined ||  filterType != "" && items[key].type.indexOf(filterType) != -1){
 					drawType(hehe.x, hehe.y, hehe.r, items[key].type);
 				}
+=======
+				
+				drawType(hehe.x, hehe.y, 0, items[key].type);
+>>>>>>> Stashed changes
 			}
 		}
 	}
@@ -595,6 +603,10 @@
 	function sliderChangeEndEvent() {
 		if (wasTimer)
 			play();
+	}
+	
+	function heightSliderChange() {
+		zScale = parseInt(document.getElementById('heightSlider').value);
 	}
 			//function textList()
 
