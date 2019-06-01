@@ -418,35 +418,52 @@
 		
 		return container[container.length - 1];
 	}
-
+	
 	function circleRadius(cp) {
 		return (-cp.z / 2) + 5
+	}
+
+	function circlePos(cp) {
+		return {
+			x: cp.x * 22 - 200,
+			y: cp.y * 20 - (cp.z * 10),
+			r: circleRadius(cp)
+		}
+	}
+
+	
+	function circlePosBetween(from, to, percent) {
+		percent = Math.min(Math.max(percent, 0), 100);
+		
+		let fromCP = circlePos(from);
+		let toCP = circlePos(to);
+		return {
+			x: fromCP.x + (toCP.x - fromCP.x) * percent / 100,
+			y: fromCP.y + (toCP.y - fromCP.y) * percent / 100,
+			r: fromCP.r + (toCP.r - fromCP.r) * percent / 100
+		}
 	}
 
 	function drawCheckpoints() {
 				for (i = 0; i < checkpoints.length; i++) {
 					for (j = 0; j < checkpoints[i].nextCPs.length; j++) {
-						let fromX = checkpoints[i].x * 22 - 200; 
-						let fromY = checkpoints[i].y * 20 - (checkpoints[i].z * 10);
-						let fromR = circleRadius(checkpoints[i]);
-						let toX = checkpoints[i].nextCPs[j].x * 22 - 200;
-						let toY = checkpoints[i].nextCPs[j].y * 20 - (checkpoints[i].nextCPs[j].z * 10);
-						let toR = circleRadius(checkpoints[i].nextCPs[j]);
-						let dirX = toX - fromX;
-						let dirY = toY - fromY;
-						var norm = Math.sqrt(dirX * dirX + dirY * dirY);
+						let fromCP = circlePos(checkpoints[i]);
+						let toCP = circlePos(checkpoints[i].nextCPs[j]);
+						let dirX = toCP.x - fromCP.x;
+						let dirY = toCP.y - fromCP.y;
+						let norm = Math.sqrt(dirX * dirX + dirY * dirY);
 						dirX /= norm;
 						dirY /= norm;
 
 						ctx.beginPath();
-						ctx.moveTo(fromX + dirY * fromR, fromY - dirX * fromR);
-						ctx.lineTo(toX + dirY * toR, toY - dirX * toR);
+						ctx.moveTo(fromCP.x + dirY * fromCP.r, fromCP.y - dirX * fromCP.r);
+						ctx.lineTo(toCP.x + dirY * toCP.r, toCP.y - dirX * toCP.r);
 						ctx.strokeStyle = "black";
 						ctx.stroke();
 						
 						ctx.beginPath();
-						ctx.moveTo(fromX - dirY * fromR, fromY + dirX * fromR);
-						ctx.lineTo(toX - dirY * toR, toY + dirX * toR);
+						ctx.moveTo(fromCP.x - dirY * fromCP.r, fromCP.y + dirX * fromCP.r);
+						ctx.lineTo(toCP.x - dirY * toCP.r, toCP.y + dirX * toCP.r);
 						ctx.strokeStyle = "black";
 						ctx.stroke();
 					}
@@ -454,7 +471,9 @@
 			
 				for (i = 0; i < checkpoints.length; i++) {
 					ctx.beginPath();
-					ctx.arc(checkpoints[i].x * 22 - 200, checkpoints[i].y * 20 - (checkpoints[i].z * 10), circleRadius(checkpoints[i]), 0, 2 * Math.PI);
+					let cp = circlePos(checkpoints[i]);
+
+					ctx.arc(cp.x, cp.y, cp.r, 0, 2 * Math.PI);
 					ctx.strokeStyle = "green";
 					ctx.stroke();
 				}
