@@ -548,19 +548,9 @@
 				
 				
 				var hehe = circlePosBetween(previousCP, nextCP, timeScale * 100);
-<<<<<<< Updated upstream
-				/*ctx.beginPath();
-
-				ctx.arc(hehe.x, hehe.y, hehe.r, 0, 2 * Math.PI);
-				ctx.strokeStyle = "green";
-				ctx.stroke();*/
 				if(filterType == undefined ||  filterType != "" && items[key].type.indexOf(filterType) != -1){
 					drawType(hehe.x, hehe.y, hehe.r, items[key].type);
 				}
-=======
-				
-				drawType(hehe.x, hehe.y, 0, items[key].type);
->>>>>>> Stashed changes
 			}
 		}
 	}
