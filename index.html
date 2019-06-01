@@ -414,13 +414,40 @@
 		return container[container.length - 1];
 	}
 	
+	function normalize(point, scale) {
+		if (norm != 0) { // as3 return 0,0 for a point of zero length
+			point.x = scale * point.x / norm;
+			point.y = scale * point.y / norm;
+		}
+	}
+	
+	function circleRadius(cp) {
+		return (-cp.z / 2) + 5
+	}
 	function drawCheckpoints() {
-			
 				for (i = 0; i < checkpoints.length; i++) {
 					for (j = 0; j < checkpoints[i].nextCPs.length; j++) {
+						let fromX = checkpoints[i].x * 22 - 200; 
+						let fromY = checkpoints[i].y * 20 - (checkpoints[i].z * 10);
+						let fromR = circleRadius(checkpoints[i]);
+						let toX = checkpoints[i].nextCPs[j].x * 22 - 200;
+						let toY = checkpoints[i].nextCPs[j].y * 20 - (checkpoints[i].nextCPs[j].z * 10);
+						let toR = circleRadius(checkpoints[i].nextCPs[j]);
+						let dirX = toX - fromX;
+						let dirY = toY - fromY;
+						var norm = Math.sqrt(dirX * dirX + dirY * dirY);
+						dirX /= norm;
+						dirY /= norm;
+
 						ctx.beginPath();
-						ctx.moveTo(checkpoints[i].x * 22 - 200, checkpoints[i].y * 20 - (checkpoints[i].z * 10));
-						ctx.lineTo(checkpoints[i].nextCPs[j].x * 22 - 200, checkpoints[i].nextCPs[j].y * 20 - (checkpoints[i].nextCPs[j].z * 10));
+						ctx.moveTo(fromX + dirY * fromR, fromY - dirX * fromR);
+						ctx.lineTo(toX + dirY * toR, toY - dirX * toR);
+						ctx.strokeStyle = "black";
+						ctx.stroke();
+						
+						ctx.beginPath();
+						ctx.moveTo(fromX - dirY * fromR, fromY + dirX * fromR);
+						ctx.lineTo(toX - dirY * toR, toY + dirX * toR);
 						ctx.strokeStyle = "black";
 						ctx.stroke();
 					}
@@ -428,28 +455,10 @@
 			
 				for (i = 0; i < checkpoints.length; i++) {
 					ctx.beginPath();
-					ctx.arc(checkpoints[i].x * 22 - 200, checkpoints[i].y * 20 - (checkpoints[i].z * 10), (-checkpoints[i].z / 2) + 5, 0, 2 * Math.PI);
+					ctx.arc(checkpoints[i].x * 22 - 200, checkpoints[i].y * 20 - (checkpoints[i].z * 10), circleRadius(checkpoints[i]), 0, 2 * Math.PI);
 					ctx.strokeStyle = "green";
 					ctx.stroke();
 				}
-	
-				/*ctx.beginPath();
-						ctx.moveTo(items[scanData[i].id].location[0] * 22 - 200, items[scanData[i].id].location[1] * 20 - (items[scanData[i].id].location[2] * 10));
-						ctx.lineTo(scanData[i].location[0] * 22 - 200, scanData[i].location[1] * 20 - (scanData[i].location[2] * 10));
-						ctx.strokeStyle = "black";
-						ctx.stroke();*/
-						
-						/*ctx.beginPath();
-						ctx.moveTo(items[scanData[i].id].location[0] * 22 - 200, items[scanData[i].id].location[1] * 20);
-						ctx.lineTo(items[scanData[i].id].location[0] * 22 - 200, scanData[i].location[1] * 20);
-						ctx.strokeStyle = "red";
-						ctx.stroke();
-						
-						ctx.beginPath();
-						ctx.moveTo(items[scanData[i].id].location[0] * 22 - 200, scanData[i].location[1] * 20);
-						ctx.lineTo(scanData[i].location[0] * 22 - 200, scanData[i].location[1] * 20);
-						ctx.strokeStyle = "red";
-						ctx.stroke();*/
  			}
 
 	function pause(){
