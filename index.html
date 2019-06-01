@@ -68,21 +68,15 @@
 					}
 					
 					//Location build
-					var locationCount = 0;
-					while (locationCount < locations.length && !(locations[locationCount].x == scanData[i].location[0] &&
-																 locations[locationCount].y == scanData[i].location[1] &&
-																 locations[locationCount].z == scanData[i].location[2])) {
-						locationCount++;
-					}
+					var loc = {
+						x:scanData[i].location[0],
+						y:scanData[i].location[1],
+						z:scanData[i].location[2]
+					};
 					
-					if (locationCount == locations.length) {
-						locations.push({
-							x:scanData[i].location[0],
-							y:scanData[i].location[1],
-							z:scanData[i].location[2]
-						});
-					}
-					
+					if (locationFind(loc) == null) {
+						locationAdd(loc);
+					}	
 					
 					ctx.beginPath();
 					ctx.arc(scanData[i].location[0] * 22 - 200, scanData[i].location[1] * 20 - (scanData[i].location[2] * 10), (-scanData[i].location[2] / 2) + 5, 0, 2 * Math.PI);
@@ -147,6 +141,32 @@
 				
 				ctx.fillText(emojistring, x, y);
 			}
+			
+			function locationFind(loc) {
+				var locationCount = 0;
+				while (locationCount < locations.length && !(locations[locationCount].x == loc.x &&
+															 locations[locationCount].y == loc.y &&
+															 locations[locationCount].z == loc.z)) {
+					locationCount++;
+				}
+				
+				if (locationCount < locations.length) {
+					return locations[locationCount];
+				} else {
+					return null;
+				}
+			}
+			
+			function locationAdd(loc) {
+				locations.push({
+					id: locations.length,
+					x:loc.x,
+					y:loc.y,
+					z:loc.z
+				});
+			}
+			
+			//function textList()
 			
 		</script>
 	
