@@ -60,8 +60,8 @@
 <body>
 	<div id="container">
 		<canvas id="myCanvas" width="1000" height="600" style="border:1px solid #000000;"></canvas>
-		<input type="range" class="slider" id="slider" onchange="sliderChangeEvent()">
-		<button id="pauseButton" onclick="pause()">Pause</button>
+		<input type="range" class="slider" id="slider" onmousedown="sliderChangeEvent()" onmouseup="sliderChangeEndEvent()" onchange="sliderChangeMoveEvent()">
+		<button id="pauseButton" onclick="pause()" disabled>Pause</button>
 		<button id="playButton" onclick="play()">Play</button>
 	</div>
 
@@ -410,6 +410,7 @@
 		$("#playButton").attr("disabled",false);
 
 		clearInterval(timer);
+		timer = undefined;
 	}
 
 	function play(){
@@ -424,10 +425,11 @@
 				}
 				clearCanvas();
 				drawCanvas();
-				$("#slider").attr("value", currentTime);
+				document.getElementById('slider').value = currentTime +"";
 			} else {
 				pause();
 			}
+			console.info(currentTime)
 		}, tickRate)
 	}
 
@@ -439,11 +441,22 @@
 	function drawCanvas(){
 	}
 
-	function sliderChangeEvent(){
-		let value = $("#slider").attr("value");
+	var wasTimer;
+	function sliderChangeEvent() {
+		wasTimer = timer;
+		if (wasTimer)
+			pause();
+	}
+
+	function sliderChangeMoveEvent() {
+		let value = document.getElementById('slider').value;
 		currentTime = parseInt(value);
 	}
 
+	function sliderChangeEndEvent() {
+		if (wasTimer)
+			play();
+	}
 			//function textList()
 
 </script>
