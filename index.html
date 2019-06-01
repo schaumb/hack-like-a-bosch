@@ -19,14 +19,14 @@
 		}
 
 		body {
-			background-image: url('bosch-logo.jpg');
+			background-image: url('bosch-logo-2.png');
 			background-repeat: no-repeat;
 			background-attachment: fixed;
 			background-position: center;
 			background-size: contain;
 		}
 
-		#myCanvas {
+		#container {
 			position: absolute;
 			margin: 0 auto;
 
@@ -42,21 +42,30 @@
 			width: 100%;
 			height: 100%;
 		}
+		#ownLogo {
+			position: absolute;
+			right: 0px;
+			bottom: 0px;
+			font-size: 50px;
+		}
+		
+		#myRange {
+			width: 100%;
+		}
 	</style>
 
 
 </head>
 
 <body>
-	<div>
+	<div id="container">
 		<canvas id="myCanvas" width="1000" height="600" style="border:1px solid #000000;"></canvas>
-	</div>
-	<div>
+		<input type="range" min="1" max="100" value="50" class="slider" id="myRange">
 		<button id="pauseButton">Pause</button>
 		<button id="playButton">Play</button>
-		<input type="range" min="1" max="100" value="50" class="slider" id="myRange">
 	</div>
 
+	<div id="ownLogo"><font color="brown">🍞</font><font color="black">➕️</font><font color="red">🍅</font></div>
 
 </body>
 <script>
