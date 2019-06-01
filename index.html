@@ -65,7 +65,12 @@
 			<code id="currentTime"></code>
 		</div>
 		<div>
-			<input id="filterInput" onkeyup="filter()">
+			<label for="filterIdInput">Id:</label>
+			<input id="filterIdInput" onkeyup="filterById()">
+			<label for="filterTypeInput">Type:</label>
+			<input id="filterTypeInput" onkeyup="filterByType()">
+			<label for="filterNameInput">Name:</label>
+			<input id="filterNameInput" onkeyup="filterByName()">
 		</div>
 		<canvas id="myCanvas" width="1000" height="600" style="border:1px solid #000000;"></canvas>
 		<input type="range" class="slider" id="slider" onmousedown="sliderChangeEvent()" onmouseup="sliderChangeEndEvent()" onchange="sliderChangeMoveEvent()">
@@ -88,6 +93,8 @@
 	var tickRate = 1000/30;
 	var timeBetweenTicks = tickRate * 10;
 	var timer;
+	var filterId;
+	var filterName;
 	var filterType;
 	var zScale = 10;
 	
@@ -548,15 +555,39 @@
 				
 				
 				var hehe = circlePosBetween(previousCP, nextCP, timeScale * 100);
-				if(filterType == undefined ||  filterType != "" && items[key].type.indexOf(filterType) != -1){
+				if((filterType == undefined || items[key].type.indexOf(filterType) != -1 )&&
+				 (filterId == undefined || items[key].id.indexOf(filterId) != -1 )&&
+				 (filterName == undefined || items[key].name.indexOf(filterName) != -1)){
 					drawType(hehe.x, hehe.y, hehe.r, items[key].type);
 				}
 			}
 		}
 	}
 
-	function filter(){
-		var filterInput = document.getElementById("filterInput").value;
+	function filterById(){
+		var filterInput = document.getElementById("filterIdInput").value;
+		if(filterInput != "" && filterInput != undefined){
+			filterId = filterInput;
+		} else {
+			filterId = undefined;
+		}
+		clearCanvas();
+		drawCanvas();
+	}
+
+	function filterByName(){
+		var filterInput = document.getElementById("filterNameInput").value;
+		if(filterInput != "" && filterInput != undefined){
+			filterName = filterInput;
+		} else {
+			filterName = undefined;
+		}
+		clearCanvas();
+		drawCanvas();
+	}
+
+	function filterByType(){
+		var filterInput = document.getElementById("filterTypeInput").value;
 		if(filterInput != "" && filterInput != undefined){
 			filterType = filterInput;
 		} else {
