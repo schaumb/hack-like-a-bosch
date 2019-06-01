@@ -65,7 +65,29 @@
 					
 					ctx.beginPath();
 					ctx.arc(scanData[i].location[0] * 22 - 200, scanData[i].location[1] * 20, 4, 0, 2 * Math.PI);
-					ctx.stroke();  
+					ctx.stroke();
+					
+					if (items[scanData[i].id] != undefined) {
+						ctx.strokeStyle = "black";
+						ctx.moveTo(items[scanData[i].id].location[0] * 22 - 200, items[scanData[i].id].location[1] * 20);
+						ctx.lineTo(scanData[i].location[0] * 22 - 200, scanData[i].location[1] * 20);
+						ctx.stroke();
+						
+						ctx.strokeStyle = "red";
+						ctx.moveTo(items[scanData[i].id].location[0] * 22 - 200, items[scanData[i].id].location[1] * 20);
+						ctx.lineTo(items[scanData[i].id].location[0] * 22 - 200, scanData[i].location[1] * 20);
+						ctx.stroke();
+						
+						ctx.moveTo(items[scanData[i].id].location[0] * 22 - 200, scanData[i].location[1] * 20);
+						ctx.lineTo(scanData[i].location[0] * 22 - 200, scanData[i].location[1] * 20);
+						ctx.stroke();
+						
+					}
+					
+					items[scanData[i].id] = scanData[i];
+					
+					
+					
 				};
 				
 				console.log(maxX);
