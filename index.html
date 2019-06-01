@@ -10,7 +10,7 @@
 	<style>
 		@font-face {
 			font-family: 'emojii';
-			src: url('EmojiOneColor-SVGinOT.ttf');
+			src: url('TwitterColorEmoji-SVGinOT.ttf');
 		}
 
 
@@ -184,13 +184,9 @@
 		$("#slider").attr("min",minTime).attr("max",maxTime).attr("value", minTime);
 		currentTime = minTime;
 	});
-
-	function drawType(x, y, z, type) {
-		// The size of the emoji is set with the font
-		ctx.font = '20px serif'
-		ctx.textAlign = "center";
-		ctx.textBaseline = "middle";
-
+	
+	
+	function getEmoji(type) {
 		var emojistring = "";
 
 		switch (type) {
@@ -373,7 +369,16 @@
 			case "zipper": emojistring = "🤐"; break; default: emojistring = "🍞"; break;
 		}
 
-		ctx.fillText(emojistring, x, y);
+		return emojistring;
+	}
+
+	function drawType(x, y, z, type) {
+		// The size of the emoji is set with the font
+		ctx.font = '20px serif'
+		ctx.textAlign = "center";
+		ctx.textBaseline = "middle";
+
+		ctx.fillText(getEmoji(type), x, y);
 	}
 
 	function locationFind(loc) {
