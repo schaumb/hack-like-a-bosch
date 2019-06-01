@@ -76,7 +76,7 @@
 	var locations = [];
 	var currentTime;
 	var tickRate = 1000/60;
-	var timeBetweenTicks = tickRate;
+	var timeBetweenTicks = tickRate * 10;
 	var timer;
 	var minTime;
 	var maxTime;
@@ -181,7 +181,7 @@
 		console.log("Timediff:" + (maxTime - minTime));
 
 		
-		$("#slider").attr("min",minTime).attr("max",maxTime).attr("value", minTime);
+		$("#slider").attr("min",minTime).attr("max",maxTime);
 		currentTime = minTime;
 	});
 	
@@ -451,6 +451,9 @@
 	function sliderChangeMoveEvent() {
 		let value = document.getElementById('slider').value;
 		currentTime = parseInt(value);
+		
+		clearCanvas();
+		drawCanvas();
 	}
 
 	function sliderChangeEndEvent() {
