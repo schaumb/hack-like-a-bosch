@@ -64,7 +64,7 @@
 					}
 					
 					ctx.beginPath();
-					ctx.arc(scanData[i].location[0] * 22 - 200, scanData[i].location[1] * 20, 4, 0, 2 * Math.PI);
+					ctx.arc(scanData[i].location[0] * 22 - 200, scanData[i].location[1] * 20, -minZ + scanData[i].location[2], 0, 2 * Math.PI);
 					ctx.stroke();
 					
 					if (items[scanData[i].id] != undefined) {
@@ -85,9 +85,6 @@
 					}
 					
 					items[scanData[i].id] = scanData[i];
-					
-					
-					
 				};
 				
 				console.log(maxX);
