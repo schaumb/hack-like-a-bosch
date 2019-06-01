@@ -59,10 +59,15 @@
 
 <body>
 	<div id="container">
+		<div>
+			<code id="currentTime"></code>
+		</div>
 		<canvas id="myCanvas" width="1000" height="600" style="border:1px solid #000000;"></canvas>
 		<input type="range" class="slider" id="slider" onmousedown="sliderChangeEvent()" onmouseup="sliderChangeEndEvent()" onchange="sliderChangeMoveEvent()">
 		<button id="pauseButton" onclick="pause()" disabled>Pause</button>
 		<button id="playButton" onclick="play()">Play</button>
+		<input id="gotoInput" type="text">
+		<button id="gotoButton" onclick="goToTime()">Go</button>
 	</div>
 
 	<div id="ownLogo"><font color="brown">🍞</font><font color="black">➕️</font><font color="red">🍅</font></div>
@@ -184,7 +189,7 @@
 		
 		$("#slider").attr("min",minTime).attr("max",maxTime);
 		currentTime = minTime;
-		
+		clearCanvas();
 		drawCheckpoints();
 	});
 	
@@ -483,9 +488,19 @@
 	function clearCanvas(){
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
 		ctx.clearRect(0, 0, c.width, c.height);
+		document.getElementById("currentTime").innerText = Math.round(currentTime);
 	}
 
 	function drawCanvas(){
+	}
+
+	function goToTime(){
+		var time = document.getElementById("gotoInput").value;
+		if(time != undefined && time != "" && (parseInt(time) >= minTime || parseInt(time) <= maxTime)){
+			document.getElementById('slider').value = time;
+			sliderChangeMoveEvent();
+			pause();
+		}
 	}
 
 	var wasTimer;
