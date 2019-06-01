@@ -52,6 +52,14 @@
 		.slider {
 			width: 100%;
 		}
+
+		#gotoInput {
+			display: none;
+		}
+
+		#gotoButton {
+			display: none;
+		}
 	</style>
 
 
@@ -557,7 +565,7 @@
 	function clearCanvas(){
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
 		ctx.clearRect(0, 0, c.width, c.height);
-		document.getElementById("currentTime").innerText = Math.round(currentTime);
+		document.getElementById("currentTime").innerText = new Date(Math.round(currentTime));
 	}
 
 	function drawCanvas(){
