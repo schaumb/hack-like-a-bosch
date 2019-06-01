@@ -413,17 +413,11 @@
 		
 		return container[container.length - 1];
 	}
-	
-	function normalize(point, scale) {
-		if (norm != 0) { // as3 return 0,0 for a point of zero length
-			point.x = scale * point.x / norm;
-			point.y = scale * point.y / norm;
-		}
-	}
-	
+
 	function circleRadius(cp) {
 		return (-cp.z / 2) + 5
 	}
+
 	function drawCheckpoints() {
 				for (i = 0; i < checkpoints.length; i++) {
 					for (j = 0; j < checkpoints[i].nextCPs.length; j++) {
