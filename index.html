@@ -79,7 +79,7 @@
 	var ctx = c.getContext("2d");
 	var items = [];
 	var currentTime;
-	var tickRate = 1000/60;
+	var tickRate = 1000/30;
 	var timeBetweenTicks = tickRate * 10;
 	var timer;
 	
@@ -382,7 +382,7 @@
 
 	function drawType(x, y, z, type) {
 		// The size of the emoji is set with the font
-		ctx.font = '20px serif'
+		ctx.font = (z+10) + 'px emojii'
 		ctx.textAlign = "center";
 		ctx.textBaseline = "middle";
 
@@ -545,7 +545,7 @@
 				ctx.strokeStyle = "green";
 				ctx.stroke();*/
 				
-				drawType(hehe.x, hehe.y, 0, items[key].type);
+				drawType(hehe.x, hehe.y, hehe.r, items[key].type);
 			}
 		}
 	}
