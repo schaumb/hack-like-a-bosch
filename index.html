@@ -190,7 +190,7 @@
 		$("#slider").attr("min",minTime).attr("max",maxTime);
 		currentTime = minTime;
 		clearCanvas();
-		drawCheckpoints();
+		drawCanvas();
 	});
 	
 	
@@ -514,6 +514,40 @@
 	}
 
 	function drawCanvas(){
+		drawCheckpoints();
+		console.log("hehe");
+		
+		for (var key in items) {
+			var previousCP, nextCP;
+			
+			var j = 0;
+			
+			while (j < items[key].locations.length - 1 && !(items[key].locations[j].timestamp <= currentTime && items[key].locations[j + 1].timestamp > currentTime)) {
+				j++;
+	}
+			
+			if (j < items[key].locations.length - 1) {
+				
+				previousCP = items[key].locations[j].checkpoint;
+				nextCP = items[key].locations[j + 1].checkpoint;
+				
+				var timeScale = (currentTime - items[key].locations[j].timestamp) / (items[key].locations[j + 1].timestamp - items[key].locations[j].timestamp);
+				var x = (nextCP.x - previousCP.x) * timeScale + previousCP.x;
+				var y = (nextCP.y - previousCP.y) * timeScale + previousCP.y;
+				
+				console.log(x + " " + y);
+				
+				
+				var hehe = circlePosBetween(previousCP, nextCP, timeScale * 100);
+				/*ctx.beginPath();
+
+				ctx.arc(hehe.x, hehe.y, hehe.r, 0, 2 * Math.PI);
+				ctx.strokeStyle = "green";
+				ctx.stroke();*/
+				
+				drawType(hehe.x, hehe.y, 0, items[key].type);
+			}
+		}
 	}
 
 	function goToTime(){
