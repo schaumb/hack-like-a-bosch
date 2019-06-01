@@ -73,13 +73,14 @@
 	var c = document.getElementById("myCanvas");
 	var ctx = c.getContext("2d");
 	var items = [];
-	var locations = [];
 	var currentTime;
 	var tickRate = 1000/60;
 	var timeBetweenTicks = tickRate;
 	var timer;
-	var minTime;
-	var maxTime;
+	
+	var checkpoints = [];
+	var maxX = -10000.0, minX = 10000.0, maxY = -10000.0, minY = 10000.0, maxZ = -10000.0, minZ = 10000.0;
+	var minTime = 15393024303810, maxTime = 0;
 
 	$.ajax({
 		method: "GET",
@@ -130,37 +131,37 @@
 				z: scanData[i].location[2]
 			};
 
-			if (locationFind(loc) == null) {
-				locationAdd(loc);
+			var currentCheckpoint = checkpointFind(checkpoints, loc);
+			if (currentCheckpoint == null) {
+				currentCheckpoint = checkpointAdd(checkpoints, loc);
 			}
 
-			ctx.beginPath();
-			ctx.arc(scanData[i].location[0] * 22 - 200, scanData[i].location[1] * 20 - (scanData[i].location[2] * 10), (-scanData[i].location[2] / 2) + 5, 0, 2 * Math.PI);
-			ctx.stroke();
-
-			if (items[scanData[i].id] != undefined) {
-
-				ctx.moveTo(items[scanData[i].id].location[0] * 22 - 200, items[scanData[i].id].location[1] * 20 - (items[scanData[i].id].location[2] * 10));
-				ctx.lineTo(scanData[i].location[0] * 22 - 200, scanData[i].location[1] * 20 - (scanData[i].location[2] * 10));
-				//ctx.strokeStyle = "green";
-				ctx.stroke();
-
-				/*ctx.moveTo(items[scanData[i].id].location[0] * 22 - 200, items[scanData[i].id].location[1] * 20);
-				ctx.lineTo(items[scanData[i].id].location[0] * 22 - 200, scanData[i].location[1] * 20);
-				//ctx.strokeStyle = "red";
-				ctx.stroke();
+			if (items[scanData[i].id] == undefined) {
+				items[scanData[i].id] = {
+					id: scanData[i].id,
+					name: scanData[i].name,
+					type: scanData[i].type,
+					locations: [{timestamp: scanData[i].timestamp, checkpoint: currentCheckpoint}]
+				};
+			} else {
+				var lastLocation = items[scanData[i].id].locations[items[scanData[i].id].locations.length - 1];
+				items[scanData[i].id].locations.push({timestamp: scanData[i].timestamp, checkpoint: currentCheckpoint});
+				var newLocation = items[scanData[i].id].locations[items[scanData[i].id].locations.length - 1];
 				
-				ctx.moveTo(items[scanData[i].id].location[0] * 22 - 200, scanData[i].location[1] * 20);
-				ctx.lineTo(scanData[i].location[0] * 22 - 200, scanData[i].location[1] * 20);
-				//ctx.strokeStyle = "red";
-				ctx.stroke();*/
-
+				if (lastLocation != undefined) {
+					if (!lastLocation.checkpoint.nextCPs.includes(newLocation.checkpoint)) {
+						lastLocation.checkpoint.nextCPs.push(newLocation.checkpoint);
+					}
+					
+					if (!newLocation.checkpoint.previousCPs.includes(lastLocation.checkpoint)) {
+						newLocation.checkpoint.previousCPs.push(lastLocation.checkpoint);
+					}
+				}
 			}
 
-			items[scanData[i].id] = scanData[i];
 		};
 
-		locations.sort(function (a, b) {
+		checkpoints.sort(function (a, b) {
 			if (a.x != b.x) {
 				return b.x - a.x;
 			} else if (a.y != b.y) {
@@ -183,6 +184,8 @@
 		
 		$("#slider").attr("min",minTime).attr("max",maxTime).attr("value", minTime);
 		currentTime = minTime;
+		
+		drawCheckpoints();
 	});
 	
 	
@@ -381,29 +384,73 @@
 		ctx.fillText(getEmoji(type), x, y);
 	}
 
-	function locationFind(loc) {
-		var locationCount = 0;
-		while (locationCount < locations.length && !(locations[locationCount].x == loc.x &&
-			locations[locationCount].y == loc.y &&
-			locations[locationCount].z == loc.z)) {
-			locationCount++;
+	function checkpointFind(container, loc) {
+		var checkpointCount = 0;
+		while (checkpointCount < container.length && !(container[checkpointCount].x == loc.x &&
+													 container[checkpointCount].y == loc.y &&
+													 container[checkpointCount].z == loc.z)) {
+			checkpointCount++;
 		}
-
-		if (locationCount < locations.length) {
-			return locations[locationCount];
+		
+		if (checkpointCount < container.length) {
+			return container[checkpointCount];
 		} else {
 			return null;
 		}
 	}
 
-	function locationAdd(loc) {
-		locations.push({
-			id: locations.length,
-			x: loc.x,
-			y: loc.y,
-			z: loc.z
+	function checkpointAdd(container, loc) {
+		container.push({
+			id: container.length,
+			x:loc.x,
+			y:loc.y,
+			z:loc.z,
+			isStart: false,
+			isEnd: false,
+			nextCPs: [],
+			previousCPs: [],
 		});
+		
+		return container[container.length - 1];
 	}
+	
+	function drawCheckpoints() {
+			
+				for (i = 0; i < checkpoints.length; i++) {
+					for (j = 0; j < checkpoints[i].nextCPs.length; j++) {
+						ctx.beginPath();
+						ctx.moveTo(checkpoints[i].x * 22 - 200, checkpoints[i].y * 20 - (checkpoints[i].z * 10));
+						ctx.lineTo(checkpoints[i].nextCPs[j].x * 22 - 200, checkpoints[i].nextCPs[j].y * 20 - (checkpoints[i].nextCPs[j].z * 10));
+						ctx.strokeStyle = "black";
+						ctx.stroke();
+					}
+				}
+			
+				for (i = 0; i < checkpoints.length; i++) {
+					ctx.beginPath();
+					ctx.arc(checkpoints[i].x * 22 - 200, checkpoints[i].y * 20 - (checkpoints[i].z * 10), (-checkpoints[i].z / 2) + 5, 0, 2 * Math.PI);
+					ctx.strokeStyle = "green";
+					ctx.stroke();
+				}
+	
+				/*ctx.beginPath();
+						ctx.moveTo(items[scanData[i].id].location[0] * 22 - 200, items[scanData[i].id].location[1] * 20 - (items[scanData[i].id].location[2] * 10));
+						ctx.lineTo(scanData[i].location[0] * 22 - 200, scanData[i].location[1] * 20 - (scanData[i].location[2] * 10));
+						ctx.strokeStyle = "black";
+						ctx.stroke();*/
+						
+						/*ctx.beginPath();
+						ctx.moveTo(items[scanData[i].id].location[0] * 22 - 200, items[scanData[i].id].location[1] * 20);
+						ctx.lineTo(items[scanData[i].id].location[0] * 22 - 200, scanData[i].location[1] * 20);
+						ctx.strokeStyle = "red";
+						ctx.stroke();
+						
+						ctx.beginPath();
+						ctx.moveTo(items[scanData[i].id].location[0] * 22 - 200, scanData[i].location[1] * 20);
+						ctx.lineTo(scanData[i].location[0] * 22 - 200, scanData[i].location[1] * 20);
+						ctx.strokeStyle = "red";
+						ctx.stroke();*/
+ 			}
 
 	function pause(){
 		$("#pauseButton").attr("disabled",true);
