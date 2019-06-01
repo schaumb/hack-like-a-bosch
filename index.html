@@ -60,7 +60,7 @@
 <body>
 	<div id="container">
 		<canvas id="myCanvas" width="1000" height="600" style="border:1px solid #000000;"></canvas>
-		<input type="range" min="1" max="100" value="1" class="slider" id="slider" onchange="sliderChangeEvent()">
+		<input type="range" class="slider" id="slider" onchange="sliderChangeEvent()">
 		<button id="pauseButton" onclick="pause()">Pause</button>
 		<button id="playButton" onclick="play()">Play</button>
 	</div>
@@ -74,6 +74,12 @@
 	var ctx = c.getContext("2d");
 	var items = [];
 	var locations = [];
+	var currentTime;
+	var tickRate = 1000/60;
+	var timeBetweenTicks = tickRate;
+	var timer;
+	var minTime;
+	var maxTime;
 
 	$.ajax({
 		method: "GET",
@@ -83,7 +89,7 @@
 		scanData = JSON.parse(data);
 
 		var maxX = -10000.0, minX = 10000.0, maxY = -10000.0, minY = 10000.0, maxZ = -10000.0, minZ = 10000.0;
-		var minTime = 15393024303810, maxTime = 0;
+		minTime = 15393024303810, maxTime = 0;
 
 
 		for (i = 0; i < scanData.length; i++) {
@@ -174,6 +180,9 @@
 		console.log("MinTime:" + minTime);
 		console.log("Timediff:" + (maxTime - minTime));
 
+		
+		$("#slider").attr("min",minTime).attr("max",maxTime).attr("value", minTime);
+		currentTime = minTime;
 	});
 
 	function drawType(x, y, z, type) {
@@ -394,16 +403,41 @@
 	function pause(){
 		$("#pauseButton").attr("disabled",true);
 		$("#playButton").attr("disabled",false);
+
+		clearInterval(timer);
 	}
 
 	function play(){
 		$("#pauseButton").attr("disabled",false);
 		$("#playButton").attr("disabled",true);
+
+		timer = setInterval(function(){
+			if(currentTime < maxTime){
+				currentTime += timeBetweenTicks;
+				if(currentTime >= maxTime){
+					currentTime = maxTime;
+				}
+				clearCanvas();
+				drawCanvas();
+				$("#slider").attr("value", currentTime);
+			} else {
+				pause();
+			}
+		}, tickRate)
+	}
+
+	function clearCanvas(){
+
+	}
+
+	function drawCanvas(){
+		console.log(currentTime);
 	}
 
 	function sliderChangeEvent(){
-		let value = $("#slider").val();
-		console.log(value);
+		let value = $("#slider").attr("value");
+		console.log(currentTime, value);
+		currentTime = parseInt(value);
 	}
 
 			//function textList()
