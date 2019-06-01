@@ -18,11 +18,12 @@
 			}
 			
 			body {
-				background-image: url('bosch-logo.jpg');
+				background-image: url('bosch-logo-2.png');
 				background-repeat: no-repeat;
 				background-attachment: fixed;
 				background-position: center;
 				background-size: contain;
+				
 			}
 			#myCanvas
 			{
@@ -40,6 +41,13 @@
 				width: 100%;
 				height: 100%;
 			}
+			
+			#ownLogo {
+				position: absolute;
+				right: 0px;
+				bottom: 0px;
+				font-size: 50px;
+			}
 		</style>
 		
 		
@@ -48,7 +56,7 @@
 
      <canvas id="myCanvas" width="1000" height="600" style="border:1px solid #000000;">
 	</canvas>
-
+	<div id="ownLogo"><font color="brown">🍞</font><font color="black">➕️</font><font color="red">🍅</font></div>
     </body>
 	<script>
 			var scanData;
