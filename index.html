@@ -66,11 +66,11 @@
 		</div>
 		<div>
 			<label for="filterIdInput">Id:</label>
-			<input id="filterIdInput" onkeyup="filterById()">
+			<input id="filterIdInput" onkeyup="filterById()" list="idList">
 			<label for="filterTypeInput">Type:</label>
-			<input id="filterTypeInput" onkeyup="filterByType()">
+			<input id="filterTypeInput" onkeyup="filterByType()" list="typeList">
 			<label for="filterNameInput">Name:</label>
-			<input id="filterNameInput" onkeyup="filterByName()">
+			<input id="filterNameInput" onkeyup="filterByName()" list="nameList">
 		</div>
 		<canvas id="myCanvas" width="1000" height="600" style="border:1px solid #000000;"></canvas>
 		<input type="range" class="slider" id="slider" onmousedown="sliderChangeEvent()" onmouseup="sliderChangeEndEvent()" onchange="sliderChangeMoveEvent()">
@@ -80,6 +80,10 @@
 		<button id="gotoButton" onclick="goToTime()">Go</button>
 		<br><span>Height scale:</span><input type="range" style="width: 50%" id="heightSlider" oninput="heightSliderChange()">
 	</div>
+	
+	<datalist id="idList"></datalist>
+	<datalist id="nameList"></datalist>
+	<datalist id="typeList"></datalist>
 
 	<div id="ownLogo"><font color="brown">🍞</font><font color="black">➕️</font><font color="red">🍅</font></div>
 
@@ -97,6 +101,7 @@
 	var filterName;
 	var filterType;
 	var zScale = 10;
+	var idList = [], nameList = [], typeList = [];
 	
 	var checkpoints = [];
 	var maxX = -10000.0, minX = 10000.0, maxY = -10000.0, minY = 10000.0, maxZ = -10000.0, minZ = 10000.0;
@@ -143,6 +148,16 @@
 			if (scanData[i].timestamp < minTime) {
 				minTime = scanData[i].timestamp;
 			}
+			
+			if (!idList.includes(scanData[i].id)) {
+				idList.push(scanData[i].id);
+			}
+			if (!nameList.includes(scanData[i].name)) {
+				nameList.push(scanData[i].name);
+			}
+			if (!typeList.includes(scanData[i].type)) {
+				typeList.push(scanData[i].type);
+			}
 
 			//Location build
 			var loc = {
@@ -180,6 +195,22 @@
 			}
 
 		};
+		
+		var listHTML = "";
+		for (i = 0; i < idList.length; i++) {
+			listHTML += "<option value=\"" + idList[i] + "\">";
+		}
+		$("#idList").html(listHTML);
+		listHTML = "";
+		for (i = 0; i < nameList.length; i++) {
+			listHTML += "<option value=\"" + nameList[i] + "\">";
+		}
+		$("#nameList").html(listHTML);
+		listHTML = "";
+		for (i = 0; i < typeList.length; i++) {
+			listHTML += "<option value=\"" + typeList[i] + "\">";
+		}
+		$("#typeList").html(listHTML);
 
 		checkpoints.sort(function (a, b) {
 			if (a.x != b.x) {
