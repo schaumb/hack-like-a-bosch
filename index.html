@@ -1,380 +1,389 @@
 <!doctype html>
 <html>
-    <head>
-        <meta charset="UTF-8" />
-        <title></title>
-		
-        <script src="jquery-3.3.1.min.js"></script>
-		
-		<style>
-			@font-face {
-				font-family: 'emojii';
-				src: url('EmojiOneColor-SVGinOT.ttf');
-			}
-			
 
-			* {
-			 font-family: emojii;
-			}
-			
-			body {
-				background-image: url('bosch-logo.jpg');
-				background-repeat: no-repeat;
-				background-attachment: fixed;
-				background-position: center;
-				background-size: contain;
-			}
-			#myCanvas
-			{
-				position: absolute;
-				margin: 0 auto;
-				
-				top: 50%;
-				left: 50%;
-				-ms-transform: translate(-50%, -50%);
-				transform: translate(-50%, -50%);
-			}
-			body {
-				padding: 0;
-				margin: 0;
-				width: 100%;
-				height: 100%;
-			}
-		</style>
-		
-		
-    </head>
-    <body>
+<head>
+	<meta charset="UTF-8" />
+	<title></title>
 
-     <canvas id="myCanvas" width="1000" height="600" style="border:1px solid #000000;">
-	</canvas>
+	<script src="jquery-3.3.1.min.js"></script>
 
-    </body>
-	<script>
-			var scanData;
-			var c = document.getElementById("myCanvas");
-			var ctx = c.getContext("2d");
-			var items = [];
-			var locations = [];
-		
-			$.ajax({
-				method: "GET",
-				url: "scans.json",
-				dataType: "text"
-			}).done(function (data) {
-				scanData = JSON.parse(data);
-				
-				var maxX = -10000.0, minX = 10000.0, maxY = -10000.0, minY = 10000.0, maxZ = -10000.0, minZ = 10000.0;
-				var minTime = 15393024303810, maxTime = 0;
-				
-				
-				for (i = 0; i < scanData.length; i++) {
-				
-					//MinMax calculations
-					if (scanData[i].location[0] > maxX) {
-						maxX = scanData[i].location[0];
-					}
-					if (scanData[i].location[0] < minX) {
-						minX = scanData[i].location[0];
-					}
-					
-					if (scanData[i].location[1] > maxY) {
-						maxY = scanData[i].location[1];
-					}
-					if (scanData[i].location[1] < minY) {
-						minY = scanData[i].location[1];
-					}
-					
-					if (scanData[i].location[2] > maxZ) {
-						maxZ = scanData[i].location[2];
-					}
-					if (scanData[i].location[2] < minZ) {
-						minZ = scanData[i].location[2];
-					}
-					
-					if (scanData[i].timestamp > maxTime) {
-						maxTime = scanData[i].timestamp;
-					}
-					if (scanData[i].timestamp < minTime) {
-						minTime = scanData[i].timestamp;
-					}
-					
-					//Location build
-					var loc = {
-						x:scanData[i].location[0],
-						y:scanData[i].location[1],
-						z:scanData[i].location[2]
-					};
-					
-					if (locationFind(loc) == null) {
-						locationAdd(loc);
-					}	
-					
-					ctx.beginPath();
-					ctx.arc(scanData[i].location[0] * 22 - 200, scanData[i].location[1] * 20 - (scanData[i].location[2] * 10), (-scanData[i].location[2] / 2) + 5, 0, 2 * Math.PI);
-					ctx.stroke();
-					
-					if (items[scanData[i].id] != undefined) {
-						
-						ctx.moveTo(items[scanData[i].id].location[0] * 22 - 200, items[scanData[i].id].location[1] * 20 - (items[scanData[i].id].location[2] * 10));
-						ctx.lineTo(scanData[i].location[0] * 22 - 200, scanData[i].location[1] * 20 - (scanData[i].location[2] * 10));
-						//ctx.strokeStyle = "green";
-						ctx.stroke();
-						
-						/*ctx.moveTo(items[scanData[i].id].location[0] * 22 - 200, items[scanData[i].id].location[1] * 20);
-						ctx.lineTo(items[scanData[i].id].location[0] * 22 - 200, scanData[i].location[1] * 20);
-						//ctx.strokeStyle = "red";
-						ctx.stroke();
-						
-						ctx.moveTo(items[scanData[i].id].location[0] * 22 - 200, scanData[i].location[1] * 20);
-						ctx.lineTo(scanData[i].location[0] * 22 - 200, scanData[i].location[1] * 20);
-						//ctx.strokeStyle = "red";
-						ctx.stroke();*/
-						
-					}
-					
-					items[scanData[i].id] = scanData[i];
-				};
-				
-				locations.sort(function (a,b) {
-					if (a.x != b.x) {
-						return b.x - a.x;
-					} else if (a.y != b.y) {
-						return b.y - a.y;
-					} else {
-						return b.z - a.z;
-					}
-				});
-				
-				console.log("MaxX:" + maxX);
-				console.log("MinX:" + minX);
-				console.log("MaxY:" + maxY);
-				console.log("MinY:" + minY);
-				console.log("MaxZ:" + maxZ);
-				console.log("MinZ:" + minZ);
-				console.log("MaxTime:" + maxTime);
-				console.log("MinTime:" + minTime);
-				console.log("Timediff:" + (maxTime - minTime));
-				
-			});
-			
-			function drawType(x, y, z, type) {
-				// The size of the emoji is set with the font
-				ctx.font = '20px serif'
-				ctx.textAlign = "center"; 
-				ctx.textBaseline = "middle"; 
-				
-				var emojistring = "";
-				
-				switch (type) {
-					case "air+freshener": emojistring = "🌫️"; break;
-					case "apple": emojistring = "🍎"; break;
-					case "bag": emojistring = "👜"; break;
-					case "balloon": emojistring = "🎈"; break;
-					case "bananas": emojistring = "🍌"; break;
-					case "beef": emojistring = "🥩"; break;
-					case "blanket": emojistring = "👘"; break;
-					case "blouse": emojistring = "👚"; break;
-					case "book": emojistring = "📗"; break;
-					case "bookmark": emojistring = "🔖"; break;
-					case "boom+box": emojistring = "📻"; break;
-					case "bottle": emojistring = "🍼"; break;
-					case "bottle+cap": emojistring = "🍶"; break;
-					case "bow": emojistring = "🏹"; break;
-					case "bowl": emojistring = "🥣"; break;
-					case "box": emojistring = "🧃"; break;
-					case "bracelet": emojistring = "🦾"; break;
-					case "bread": emojistring = "🍞"; break;
-					case "brocolli": emojistring = "🥒"; break;
-					case "buckel": emojistring = "🐪"; break;
-					case "button": emojistring = "🔘"; break;
-					case "camera": emojistring = "📷"; break;
-					case "candle": emojistring = "🕯️"; break;
-					case "candy+wrapper": emojistring = "🍬"; break;
-					case "canvas": emojistring = "📋"; break;
-					case "carrots": emojistring = "🥕"; break;
-					case "cat": emojistring = "🐈"; break;
-					case "CD": emojistring = "💿"; break;
-					case "cell+phone": emojistring = "📱"; break;
-					case "chalk": emojistring = "✍️"; break;
-					case "chapter+book": emojistring = "🕅"; break;
-					case "charger": emojistring = "🔋"; break;
-					case "checkbook": emojistring = "🛂"; break;
-					case "chocolate": emojistring = "🍫"; break;
-					case "cinder+block": emojistring = "🔥"; break;
-					case "clamp": emojistring = "🗜️"; break;
-					case "clay+pot": emojistring = "🧱"; break;
-					case "clock": emojistring = "⏰"; break;
-					case "clothes": emojistring = "👖"; break;
-					case "coasters": emojistring = "🎢"; break;
-					case "computer": emojistring = "💻"; break;
-					case "conditioner": emojistring = "🌱"; break;
-					case "controller": emojistring = "🎮"; break;
-					case "cookie+jar": emojistring = "🥠"; break;
-					case "cork": emojistring = "🍾"; break;
-					case "credit+card": emojistring = "💳"; break;
-					case "cup": emojistring = "🥤"; break;
-					case "deodorant": emojistring = "🚁"; break;
-					case "doll": emojistring = "🎎"; break;
-					case "drill+press": emojistring = "🚴"; break;
-					case "eraser": emojistring = "✏"; break;
-					case "eye+liner": emojistring = "👀"; break;
-					case "face+wash": emojistring = "🥵"; break;
-					case "fake+flowers": emojistring = "🌹"; break;
-					case "flag": emojistring = "🏳️"; break;
-					case "floor": emojistring = "🧎"; break;
-					case "flowers": emojistring = "💐"; break;
-					case "food": emojistring = "🥫"; break;
-					case "fork": emojistring = "🍴"; break;
-					case "fridge": emojistring = "❄️"; break;
-					case "glass": emojistring = "🍸"; break;
-					case "glasses": emojistring = "👓"; break;
-					case "glow+stick": emojistring = "🌟"; break;
-					case "greeting+card": emojistring = "🤝"; break;
-					case "grid+paper": emojistring = "🏁"; break;
-					case "hair+brush": emojistring = "👱‍"; break;
-					case "hair+tie": emojistring = "👔"; break;
-					case "hanger": emojistring = "📔"; break;
-					case "headphones": emojistring = "🎧"; break;
-					case "helmet": emojistring = "⛑️"; break;
-					case "ice+cube+tray": emojistring = "🧊"; break;
-					case "ipod": emojistring = "💊"; break;
-					case "keyboard": emojistring = "⌨️"; break;
-					case "key+chain": emojistring = "🔐"; break;
-					case "keys": emojistring = "🔑"; break;
-					case "knife": emojistring = "🔪"; break;
-					case "lace": emojistring = "🖲️"; break;
-					case "lamp": emojistring = "💡"; break;
-					case "lamp+shade": emojistring = "🪔"; break;
-					case "leg+warmers": emojistring = "🦵"; break;
-					case "lip+gloss": emojistring = "💄"; break;
-					case "lotion": emojistring = "🧴"; break;
-					case "magnet": emojistring = "🧲"; break;
-					case "milk": emojistring = "🥛"; break;
-					case "mirror": emojistring = "🚍"; break;
-					case "money": emojistring = "💸"; break;
-					case "monitor": emojistring = "🖥️"; break;
-					case "mop": emojistring = "🧽"; break;
-					case "mouse+pad": emojistring = "🖱️"; break;
-					case "mp3+player": emojistring = "💽"; break;
-					case "nail+clippers": emojistring = "💅"; break;
-					case "nail+file": emojistring = "📁"; break;
-					case "needle": emojistring = "💉"; break;
-					case "newspaper": emojistring = "📰"; break;
-					case "outlet": emojistring = "♀️"; break;
-					case "packing+peanuts": emojistring = "🥜"; break;
-					case "paint+brush": emojistring = "🖌️"; break;
-					case "pants": emojistring = "🧐"; break;
-					case "paper": emojistring = "🧻"; break;
-					case "pen": emojistring = "🖋️"; break;
-					case "pencil": emojistring = "✏️"; break;
-					case "perfume": emojistring = "🚬"; break;
-					case "phone": emojistring = "☎️"; break;
-					case "photo+album": emojistring = "🤳"; break;
-					case "picture+frame": emojistring = "🖼️"; break;
-					case "pillow": emojistring = "🛏️"; break;
-					case "plastic+fork": emojistring = "🎍"; break;
-					case "plate": emojistring = "🍽️"; break;
-					case "playing+card": emojistring = "🃏"; break;
-					case "pool+stick": emojistring = "🎱"; break;
-					case "puddle": emojistring = "🏊"; break;
-					case "purse": emojistring = "👛"; break;
-					case "radio": emojistring = "🎙️"; break;
-					case "remote": emojistring = "📏"; break;
-					case "ring": emojistring = "💍"; break;
-					case "rubber+band": emojistring = "💶"; break;
-					case "rubber+duck": emojistring = "🦆"; break;
-					case "rug": emojistring = "🤫"; break;
-					case "rusty+nail": emojistring = "🔨"; break;
-					case "sailboat": emojistring = "⛵"; break;
-					case "sandal": emojistring = "👡"; break;
-					case "sand+paper": emojistring = "⏳"; break;
-					case "scotch+tape": emojistring = "🥃"; break;
-					case "screw": emojistring = "🔩"; break;
-					case "seat+belt": emojistring = "🥋"; break;
-					case "shampoo": emojistring = "🧴"; break;
-					case "sharpie": emojistring = "🥧"; break;
-					case "shawl": emojistring = "☂️"; break;
-					case "shirt": emojistring = "🎽"; break;
-					case "shoe+lace": emojistring = "👞"; break;
-					case "shoes": emojistring = "👟"; break;
-					case "shovel": emojistring = "🥄"; break;
-					case "sidewalk": emojistring = "🚓"; break;
-					case "sketch+pad": emojistring = "📔"; break;
-					case "slipper": emojistring = "🥿"; break;
-					case "soap": emojistring = "🧼"; break;
-					case "socks": emojistring = "🧦"; break;
-					case "soda+can": emojistring = "🥤"; break;
-					case "sofa": emojistring = "🛋️"; break;
-					case "soy+sauce+packet": emojistring = "🍢"; break;
-					case "speakers": emojistring = "🔈"; break;
-					case "sponge": emojistring = "🧽"; break;
-					case "spoon": emojistring = "🥢"; break;
-					case "spring": emojistring = "♨️"; break;
-					case "sticky+note": emojistring = "💴"; break;
-					case "stockings": emojistring = "📈"; break;
-					case "stop+sign": emojistring = "🛑"; break;
-					case "street+lights": emojistring = "🚦"; break;
-					case "sun+glasses": emojistring = "🕶️"; break;
-					case "table": emojistring = "📋"; break;
-					case "teddies": emojistring = "🧸"; break;
-					case "thermometer": emojistring = "🌡️"; break;
-					case "thermostat": emojistring = "🤒"; break;
-					case "thread": emojistring = "🧵"; break;
-					case "tire+swing": emojistring = "😫"; break;
-					case "tissue+box": emojistring = "🤧"; break;
-					case "toe+ring": emojistring = "👣"; break;
-					case "toilet": emojistring = "🚽"; break;
-					case "tomato": emojistring = "🍅"; break;
-					case "toothbrush": emojistring = "🦷"; break;
-					case "toothpaste": emojistring = "🤪"; break;
-					case "tooth+picks": emojistring = "🗝️"; break;
-					case "towel": emojistring = "🧻"; break;
-					case "tree": emojistring = "🌳"; break;
-					case "truck": emojistring = "🚚"; break;
-					case "tv": emojistring = "📺"; break;
-					case "twezzers": emojistring = "💢"; break;
-					case "twister": emojistring = "🌀"; break;
-					case "USB+drive": emojistring = "⛓️"; break;
-					case "vase": emojistring = "⚱️"; break;
-					case "video+games": emojistring = "🎮"; break;
-					case "wagon": emojistring = "🚃"; break;
-					case "wallet": emojistring = "👛"; break;
-					case "watch": emojistring = "⌚"; break;
-					case "water+bottle": emojistring = "🌊"; break;
-					case "white+out": emojistring = "⬜"; break;
-					case "zipper": emojistring = "🤐"; break;		        			default: emojistring = "🍞"; break;
-				}
-				
-				ctx.fillText(emojistring, x, y);
+	<style>
+		@font-face {
+			font-family: 'emojii';
+			src: url('EmojiOneColor-SVGinOT.ttf');
+		}
+
+
+		* {
+			font-family: emojii;
+		}
+
+		body {
+			background-image: url('bosch-logo.jpg');
+			background-repeat: no-repeat;
+			background-attachment: fixed;
+			background-position: center;
+			background-size: contain;
+		}
+
+		#myCanvas {
+			position: absolute;
+			margin: 0 auto;
+
+			top: 50%;
+			left: 50%;
+			-ms-transform: translate(-50%, -50%);
+			transform: translate(-50%, -50%);
+		}
+
+		body {
+			padding: 0;
+			margin: 0;
+			width: 100%;
+			height: 100%;
+		}
+	</style>
+
+
+</head>
+
+<body>
+	<div>
+		<canvas id="myCanvas" width="1000" height="600" style="border:1px solid #000000;"></canvas>
+	</div>
+	<div>
+		<button id="pauseButton">Pause</button>
+		<button id="playButton">Play</button>
+		<input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+	</div>
+
+
+</body>
+<script>
+	var scanData;
+	var c = document.getElementById("myCanvas");
+	var ctx = c.getContext("2d");
+	var items = [];
+	var locations = [];
+
+	$.ajax({
+		method: "GET",
+		url: "scans.json",
+		dataType: "text"
+	}).done(function (data) {
+		scanData = JSON.parse(data);
+
+		var maxX = -10000.0, minX = 10000.0, maxY = -10000.0, minY = 10000.0, maxZ = -10000.0, minZ = 10000.0;
+		var minTime = 15393024303810, maxTime = 0;
+
+
+		for (i = 0; i < scanData.length; i++) {
+
+			//MinMax calculations
+			if (scanData[i].location[0] > maxX) {
+				maxX = scanData[i].location[0];
 			}
-			
-			function locationFind(loc) {
-				var locationCount = 0;
-				while (locationCount < locations.length && !(locations[locationCount].x == loc.x &&
-															 locations[locationCount].y == loc.y &&
-															 locations[locationCount].z == loc.z)) {
-					locationCount++;
-				}
+			if (scanData[i].location[0] < minX) {
+				minX = scanData[i].location[0];
+			}
+
+			if (scanData[i].location[1] > maxY) {
+				maxY = scanData[i].location[1];
+			}
+			if (scanData[i].location[1] < minY) {
+				minY = scanData[i].location[1];
+			}
+
+			if (scanData[i].location[2] > maxZ) {
+				maxZ = scanData[i].location[2];
+			}
+			if (scanData[i].location[2] < minZ) {
+				minZ = scanData[i].location[2];
+			}
+
+			if (scanData[i].timestamp > maxTime) {
+				maxTime = scanData[i].timestamp;
+			}
+			if (scanData[i].timestamp < minTime) {
+				minTime = scanData[i].timestamp;
+			}
+
+			//Location build
+			var loc = {
+				x: scanData[i].location[0],
+				y: scanData[i].location[1],
+				z: scanData[i].location[2]
+			};
+
+			if (locationFind(loc) == null) {
+				locationAdd(loc);
+			}
+
+			ctx.beginPath();
+			ctx.arc(scanData[i].location[0] * 22 - 200, scanData[i].location[1] * 20 - (scanData[i].location[2] * 10), (-scanData[i].location[2] / 2) + 5, 0, 2 * Math.PI);
+			ctx.stroke();
+
+			if (items[scanData[i].id] != undefined) {
+
+				ctx.moveTo(items[scanData[i].id].location[0] * 22 - 200, items[scanData[i].id].location[1] * 20 - (items[scanData[i].id].location[2] * 10));
+				ctx.lineTo(scanData[i].location[0] * 22 - 200, scanData[i].location[1] * 20 - (scanData[i].location[2] * 10));
+				//ctx.strokeStyle = "green";
+				ctx.stroke();
+
+				/*ctx.moveTo(items[scanData[i].id].location[0] * 22 - 200, items[scanData[i].id].location[1] * 20);
+				ctx.lineTo(items[scanData[i].id].location[0] * 22 - 200, scanData[i].location[1] * 20);
+				//ctx.strokeStyle = "red";
+				ctx.stroke();
 				
-				if (locationCount < locations.length) {
-					return locations[locationCount];
-				} else {
-					return null;
-				}
+				ctx.moveTo(items[scanData[i].id].location[0] * 22 - 200, scanData[i].location[1] * 20);
+				ctx.lineTo(scanData[i].location[0] * 22 - 200, scanData[i].location[1] * 20);
+				//ctx.strokeStyle = "red";
+				ctx.stroke();*/
+
 			}
-			
-			function locationAdd(loc) {
-				locations.push({
-					id: locations.length,
-					x:loc.x,
-					y:loc.y,
-					z:loc.z
-				});
+
+			items[scanData[i].id] = scanData[i];
+		};
+
+		locations.sort(function (a, b) {
+			if (a.x != b.x) {
+				return b.x - a.x;
+			} else if (a.y != b.y) {
+				return b.y - a.y;
+			} else {
+				return b.z - a.z;
 			}
-			
+		});
+
+		console.log("MaxX:" + maxX);
+		console.log("MinX:" + minX);
+		console.log("MaxY:" + maxY);
+		console.log("MinY:" + minY);
+		console.log("MaxZ:" + maxZ);
+		console.log("MinZ:" + minZ);
+		console.log("MaxTime:" + maxTime);
+		console.log("MinTime:" + minTime);
+		console.log("Timediff:" + (maxTime - minTime));
+
+	});
+
+	function drawType(x, y, z, type) {
+		// The size of the emoji is set with the font
+		ctx.font = '20px serif'
+		ctx.textAlign = "center";
+		ctx.textBaseline = "middle";
+
+		var emojistring = "";
+
+		switch (type) {
+			case "air+freshener": emojistring = "🌫️"; break;
+			case "apple": emojistring = "🍎"; break;
+			case "bag": emojistring = "👜"; break;
+			case "balloon": emojistring = "🎈"; break;
+			case "bananas": emojistring = "🍌"; break;
+			case "beef": emojistring = "🥩"; break;
+			case "blanket": emojistring = "👘"; break;
+			case "blouse": emojistring = "👚"; break;
+			case "book": emojistring = "📗"; break;
+			case "bookmark": emojistring = "🔖"; break;
+			case "boom+box": emojistring = "📻"; break;
+			case "bottle": emojistring = "🍼"; break;
+			case "bottle+cap": emojistring = "🍶"; break;
+			case "bow": emojistring = "🏹"; break;
+			case "bowl": emojistring = "🥣"; break;
+			case "box": emojistring = "🧃"; break;
+			case "bracelet": emojistring = "🦾"; break;
+			case "bread": emojistring = "🍞"; break;
+			case "brocolli": emojistring = "🥒"; break;
+			case "buckel": emojistring = "🐪"; break;
+			case "button": emojistring = "🔘"; break;
+			case "camera": emojistring = "📷"; break;
+			case "candle": emojistring = "🕯️"; break;
+			case "candy+wrapper": emojistring = "🍬"; break;
+			case "canvas": emojistring = "📋"; break;
+			case "carrots": emojistring = "🥕"; break;
+			case "cat": emojistring = "🐈"; break;
+			case "CD": emojistring = "💿"; break;
+			case "cell+phone": emojistring = "📱"; break;
+			case "chalk": emojistring = "✍️"; break;
+			case "chapter+book": emojistring = "🕅"; break;
+			case "charger": emojistring = "🔋"; break;
+			case "checkbook": emojistring = "🛂"; break;
+			case "chocolate": emojistring = "🍫"; break;
+			case "cinder+block": emojistring = "🔥"; break;
+			case "clamp": emojistring = "🗜️"; break;
+			case "clay+pot": emojistring = "🧱"; break;
+			case "clock": emojistring = "⏰"; break;
+			case "clothes": emojistring = "👖"; break;
+			case "coasters": emojistring = "🎢"; break;
+			case "computer": emojistring = "💻"; break;
+			case "conditioner": emojistring = "🌱"; break;
+			case "controller": emojistring = "🎮"; break;
+			case "cookie+jar": emojistring = "🥠"; break;
+			case "cork": emojistring = "🍾"; break;
+			case "credit+card": emojistring = "💳"; break;
+			case "cup": emojistring = "🥤"; break;
+			case "deodorant": emojistring = "🚁"; break;
+			case "doll": emojistring = "🎎"; break;
+			case "drill+press": emojistring = "🚴"; break;
+			case "eraser": emojistring = "✏"; break;
+			case "eye+liner": emojistring = "👀"; break;
+			case "face+wash": emojistring = "🥵"; break;
+			case "fake+flowers": emojistring = "🌹"; break;
+			case "flag": emojistring = "🏳️"; break;
+			case "floor": emojistring = "🧎"; break;
+			case "flowers": emojistring = "💐"; break;
+			case "food": emojistring = "🥫"; break;
+			case "fork": emojistring = "🍴"; break;
+			case "fridge": emojistring = "❄️"; break;
+			case "glass": emojistring = "🍸"; break;
+			case "glasses": emojistring = "👓"; break;
+			case "glow+stick": emojistring = "🌟"; break;
+			case "greeting+card": emojistring = "🤝"; break;
+			case "grid+paper": emojistring = "🏁"; break;
+			case "hair+brush": emojistring = "👱‍"; break;
+			case "hair+tie": emojistring = "👔"; break;
+			case "hanger": emojistring = "📔"; break;
+			case "headphones": emojistring = "🎧"; break;
+			case "helmet": emojistring = "⛑️"; break;
+			case "ice+cube+tray": emojistring = "🧊"; break;
+			case "ipod": emojistring = "💊"; break;
+			case "keyboard": emojistring = "⌨️"; break;
+			case "key+chain": emojistring = "🔐"; break;
+			case "keys": emojistring = "🔑"; break;
+			case "knife": emojistring = "🔪"; break;
+			case "lace": emojistring = "🖲️"; break;
+			case "lamp": emojistring = "💡"; break;
+			case "lamp+shade": emojistring = "🪔"; break;
+			case "leg+warmers": emojistring = "🦵"; break;
+			case "lip+gloss": emojistring = "💄"; break;
+			case "lotion": emojistring = "🧴"; break;
+			case "magnet": emojistring = "🧲"; break;
+			case "milk": emojistring = "🥛"; break;
+			case "mirror": emojistring = "🚍"; break;
+			case "money": emojistring = "💸"; break;
+			case "monitor": emojistring = "🖥️"; break;
+			case "mop": emojistring = "🧽"; break;
+			case "mouse+pad": emojistring = "🖱️"; break;
+			case "mp3+player": emojistring = "💽"; break;
+			case "nail+clippers": emojistring = "💅"; break;
+			case "nail+file": emojistring = "📁"; break;
+			case "needle": emojistring = "💉"; break;
+			case "newspaper": emojistring = "📰"; break;
+			case "outlet": emojistring = "♀️"; break;
+			case "packing+peanuts": emojistring = "🥜"; break;
+			case "paint+brush": emojistring = "🖌️"; break;
+			case "pants": emojistring = "🧐"; break;
+			case "paper": emojistring = "🧻"; break;
+			case "pen": emojistring = "🖋️"; break;
+			case "pencil": emojistring = "✏️"; break;
+			case "perfume": emojistring = "🚬"; break;
+			case "phone": emojistring = "☎️"; break;
+			case "photo+album": emojistring = "🤳"; break;
+			case "picture+frame": emojistring = "🖼️"; break;
+			case "pillow": emojistring = "🛏️"; break;
+			case "plastic+fork": emojistring = "🎍"; break;
+			case "plate": emojistring = "🍽️"; break;
+			case "playing+card": emojistring = "🃏"; break;
+			case "pool+stick": emojistring = "🎱"; break;
+			case "puddle": emojistring = "🏊"; break;
+			case "purse": emojistring = "👛"; break;
+			case "radio": emojistring = "🎙️"; break;
+			case "remote": emojistring = "📏"; break;
+			case "ring": emojistring = "💍"; break;
+			case "rubber+band": emojistring = "💶"; break;
+			case "rubber+duck": emojistring = "🦆"; break;
+			case "rug": emojistring = "🤫"; break;
+			case "rusty+nail": emojistring = "🔨"; break;
+			case "sailboat": emojistring = "⛵"; break;
+			case "sandal": emojistring = "👡"; break;
+			case "sand+paper": emojistring = "⏳"; break;
+			case "scotch+tape": emojistring = "🥃"; break;
+			case "screw": emojistring = "🔩"; break;
+			case "seat+belt": emojistring = "🥋"; break;
+			case "shampoo": emojistring = "🧴"; break;
+			case "sharpie": emojistring = "🥧"; break;
+			case "shawl": emojistring = "☂️"; break;
+			case "shirt": emojistring = "🎽"; break;
+			case "shoe+lace": emojistring = "👞"; break;
+			case "shoes": emojistring = "👟"; break;
+			case "shovel": emojistring = "🥄"; break;
+			case "sidewalk": emojistring = "🚓"; break;
+			case "sketch+pad": emojistring = "📔"; break;
+			case "slipper": emojistring = "🥿"; break;
+			case "soap": emojistring = "🧼"; break;
+			case "socks": emojistring = "🧦"; break;
+			case "soda+can": emojistring = "🥤"; break;
+			case "sofa": emojistring = "🛋️"; break;
+			case "soy+sauce+packet": emojistring = "🍢"; break;
+			case "speakers": emojistring = "🔈"; break;
+			case "sponge": emojistring = "🧽"; break;
+			case "spoon": emojistring = "🥢"; break;
+			case "spring": emojistring = "♨️"; break;
+			case "sticky+note": emojistring = "💴"; break;
+			case "stockings": emojistring = "📈"; break;
+			case "stop+sign": emojistring = "🛑"; break;
+			case "street+lights": emojistring = "🚦"; break;
+			case "sun+glasses": emojistring = "🕶️"; break;
+			case "table": emojistring = "📋"; break;
+			case "teddies": emojistring = "🧸"; break;
+			case "thermometer": emojistring = "🌡️"; break;
+			case "thermostat": emojistring = "🤒"; break;
+			case "thread": emojistring = "🧵"; break;
+			case "tire+swing": emojistring = "😫"; break;
+			case "tissue+box": emojistring = "🤧"; break;
+			case "toe+ring": emojistring = "👣"; break;
+			case "toilet": emojistring = "🚽"; break;
+			case "tomato": emojistring = "🍅"; break;
+			case "toothbrush": emojistring = "🦷"; break;
+			case "toothpaste": emojistring = "🤪"; break;
+			case "tooth+picks": emojistring = "🗝️"; break;
+			case "towel": emojistring = "🧻"; break;
+			case "tree": emojistring = "🌳"; break;
+			case "truck": emojistring = "🚚"; break;
+			case "tv": emojistring = "📺"; break;
+			case "twezzers": emojistring = "💢"; break;
+			case "twister": emojistring = "🌀"; break;
+			case "USB+drive": emojistring = "⛓️"; break;
+			case "vase": emojistring = "⚱️"; break;
+			case "video+games": emojistring = "🎮"; break;
+			case "wagon": emojistring = "🚃"; break;
+			case "wallet": emojistring = "👛"; break;
+			case "watch": emojistring = "⌚"; break;
+			case "water+bottle": emojistring = "🌊"; break;
+			case "white+out": emojistring = "⬜"; break;
+			case "zipper": emojistring = "🤐"; break; default: emojistring = "🍞"; break;
+		}
+
+		ctx.fillText(emojistring, x, y);
+	}
+
+	function locationFind(loc) {
+		var locationCount = 0;
+		while (locationCount < locations.length && !(locations[locationCount].x == loc.x &&
+			locations[locationCount].y == loc.y &&
+			locations[locationCount].z == loc.z)) {
+			locationCount++;
+		}
+
+		if (locationCount < locations.length) {
+			return locations[locationCount];
+		} else {
+			return null;
+		}
+	}
+
+	function locationAdd(loc) {
+		locations.push({
+			id: locations.length,
+			x: loc.x,
+			y: loc.y,
+			z: loc.z
+		});
+	}
+
 			//function textList()
-			
-		</script>
-	
+
+</script>
+
 </html>
