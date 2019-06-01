@@ -75,7 +75,7 @@
 	var items = [];
 	var currentTime;
 	var tickRate = 1000/60;
-	var timeBetweenTicks = tickRate;
+	var timeBetweenTicks = tickRate * 10;
 	var timer;
 	
 	var checkpoints = [];
@@ -182,7 +182,7 @@
 		console.log("Timediff:" + (maxTime - minTime));
 
 		
-		$("#slider").attr("min",minTime).attr("max",maxTime).attr("value", minTime);
+		$("#slider").attr("min",minTime).attr("max",maxTime);
 		currentTime = minTime;
 		
 		drawCheckpoints();
@@ -498,6 +498,9 @@
 	function sliderChangeMoveEvent() {
 		let value = document.getElementById('slider').value;
 		currentTime = parseInt(value);
+		
+		clearCanvas();
+		drawCanvas();
 	}
 
 	function sliderChangeEndEvent() {
